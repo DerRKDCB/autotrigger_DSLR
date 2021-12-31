@@ -4,60 +4,62 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+//Pin Definitions
 #define pinAnalogButtonInput A0
 #define pinRelayTrigger D6
 
+//Button Values
 #define valueButtonUp 588
 #define valueButtonDown 328
 #define valueButtonNext 231
 #define valueButtonStart 181
 #define buttonTolerance 10
 
+//Function Options
+#define minExposure 1000
+#define maxExposure 300000
+
+//OLED
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
-
 #define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C ///< See datasheet for Address; 0x3D for 128x64, 0x3C for 128x32
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-void testdrawchar(void) {
-  display.clearDisplay();
+//Global Variables
+long exposuretime = 180000;
 
-  display.setTextSize(1);      // Normal 1:1 pixel scale
-  display.setTextColor(SSD1306_WHITE); // Draw white text
-  display.setCursor(0, 0);     // Start at top-left corner
-  display.cp437(true);         // Use full 256 char 'Code Page 437' font
-
-  // Not all the characters will fit on the display. This is normal.
-  // Library will draw what it can and the rest will be clipped.
-  for(int16_t i=0; i<256; i++) {
-    if(i == '\n') display.write(' ');
-    else          display.write(i);
+void increaseExposure(void){
+  exposuretime += 1000;
+  if (exposuretime > maxExposure){
+    exposuretime = minExposure;
   }
+}
 
-  display.display();
-  delay(2000);
+void decreaseExposure(void){
+  exposuretime -= 1000;
+  if (exposuretime < minExposure){
+    exposuretime = maxExposure;
+  }
 }
 
 void handleButtons(int buttonvalue) {
+
+  display.setCursor(0, 40); 
+  display.setTextSize(2);
+
   if (buttonvalue <= valueButtonUp + buttonTolerance && buttonvalue >= valueButtonUp - buttonTolerance){
-    display.setCursor(0, 20); 
-    display.setTextSize(2);
     display.print(F("UP"));
+    increaseExposure();
   }
   if (buttonvalue <= valueButtonDown + buttonTolerance && buttonvalue >= valueButtonDown - buttonTolerance){
-    display.setCursor(0, 20); 
-    display.setTextSize(2);
     display.print(F("DOWN"));
+    decreaseExposure();
   }
   if (buttonvalue <= valueButtonNext + buttonTolerance && buttonvalue >= valueButtonNext - buttonTolerance){
-    display.setCursor(0, 20); 
-    display.setTextSize(2);
     display.print(F("NEXT"));
   }
   if (buttonvalue <= valueButtonStart + buttonTolerance && buttonvalue >= valueButtonStart - buttonTolerance){
-    display.setCursor(0, 20); 
-    display.setTextSize(2);
     display.print(F("START"));
 
     digitalWrite(pinRelayTrigger, HIGH);
@@ -77,13 +79,12 @@ void setup() {
     for(;;); // Don't proceed, loop forever
   }
 
-  testdrawchar();      // Draw characters of the default font
+  // Clear the buffer
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE); // Draw white text
+  display.cp437(true);         // Use full 256 char 'Code Page 437' font
 
-  // Invert and restore display, pausing in-between
-  display.invertDisplay(true);
-  delay(1000);
-  display.invertDisplay(false);
-  delay(1000);
+  delay(200); //Sanity delay
 }
 
 void loop() {
@@ -98,6 +99,11 @@ void loop() {
 
   display.setCursor(40, 0); 
   display.print(millis());
+
+  display.setCursor(0, 20); 
+  display.print(exposuretime);
+
+  display.display();
 
   handleButtons(val);
 
