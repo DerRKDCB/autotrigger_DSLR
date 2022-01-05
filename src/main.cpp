@@ -19,7 +19,8 @@
 #define minExposure 1000
 #define maxExposure 300000
 #define minNumberOfExposures 1
-#define maxNumberOfExposures 100
+#define maxNumberOfExposures 100 //absolute max 255
+#define waitingTimeBetweenExposures 1000
 
 //OLED
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -30,9 +31,12 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Global Variables
 bool isExposing = false;
-int numberOfExposures = 30;
-long exposureTime = 180000;
+int numberOfExposures = 5;
+long exposureTime = 2000;
 byte settingSelected  = 1;
+byte exposureCounter = 0;
+int startedSessionAtMillis = 0;
+bool abortSession = false;
 
 void increaseExposure(void){
   exposureTime += 1000; //increase 1s exposure time
@@ -69,6 +73,14 @@ void nextSetting(void){
   }
 }
 
+void startSession(void){
+  exposureCounter = 0;
+  isExposing = true;
+  startedSessionAtMillis = millis();
+  exposureCounter = 1;
+  abortSession = false;
+}
+
 void displaySettingsScreen(void){
   display.clearDisplay();
 
@@ -98,7 +110,8 @@ void displaySettingsScreen(void){
   display.display();
 }
 
-void handleButtonsInSettings(int buttonvalue) {
+void handleButtonsInSettings() {
+  int buttonvalue = analogRead(pinAnalogButtonInput);
 
   if (buttonvalue <= valueButtonUp + buttonTolerance && buttonvalue >= valueButtonUp - buttonTolerance){ //UP
     if (settingSelected == 1){
@@ -123,16 +136,45 @@ void handleButtonsInSettings(int buttonvalue) {
   }
 
   if (buttonvalue <= valueButtonStart + buttonTolerance && buttonvalue >= valueButtonStart - buttonTolerance){ //START
-    digitalWrite(pinRelayTrigger, HIGH);
-  }else{
-    digitalWrite(pinRelayTrigger, LOW);
+    startSession();
   }
+}
+
+void displayExposureScreen(void){
+  display.clearDisplay();
+
+  //Total Time
+  display.setCursor(0, 0);
+  display.setTextSize(1);
+  display.print(F("Total Time:  "));
+  display.print((millis() - startedSessionAtMillis) / 1000);
+  display.print(F("s"));
+
+  //Exposure Number
+  display.setCursor(0, 10);
+  display.setTextSize(1);
+  display.print(F("Exposure Number:  "));
+  display.print(exposureCounter);
+
+  //Settings
+  display.setCursor(0, 44);
+  display.setTextSize(1);
+  display.print(F("ExpoTime:  "));
+  display.print(exposureTime / 1000);
+  display.print(F("s"));
+  display.setCursor(0, 54);
+  display.setTextSize(1);
+  display.print(F("Exposures:  "));
+  display.print(numberOfExposures);
+
+  display.display();
 }
 
 void setup() {
   Serial.begin(9600);
 
   pinMode(pinRelayTrigger, OUTPUT);
+  digitalWrite(pinRelayTrigger, LOW);
 
   // SSD1306_SWITCHCAPVCC = generate display voltage from 3.3V internally
   if(!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
@@ -149,13 +191,31 @@ void setup() {
 }
 
 void loop() {
-  int val = analogRead(pinAnalogButtonInput);
-  Serial.println(val);
 
-  if (!isExposing){
+  while (!isExposing){ //Settings
     displaySettingsScreen();
-    handleButtonsInSettings(val);
+    handleButtonsInSettings();
     delay(100); //tick for settings is 100ms
+  }
+
+  while(isExposing){ //Exposing
+    
+    long currentMillis = millis();
+    while (currentMillis + exposureTime > millis()){
+      digitalWrite(pinRelayTrigger, HIGH);
+      displayExposureScreen();
+    }
+
+    currentMillis = millis();
+    while (currentMillis + waitingTimeBetweenExposures > millis()){
+      digitalWrite(pinRelayTrigger, LOW);
+      displayExposureScreen();
+    }
+
+    exposureCounter++;
+    if (exposureCounter > numberOfExposures){
+      isExposing = false;
+    }
   }
 
 }
