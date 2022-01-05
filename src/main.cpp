@@ -18,6 +18,8 @@
 //Function Options
 #define minExposure 1000
 #define maxExposure 300000
+#define minNumberOfExposures 1
+#define maxNumberOfExposures 100
 
 //OLED
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -27,41 +29,100 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Global Variables
-long exposuretime = 180000;
+bool isExposing = false;
+int numberOfExposures = 30;
+long exposureTime = 180000;
+byte settingSelected  = 1;
 
 void increaseExposure(void){
-  exposuretime += 1000;
-  if (exposuretime > maxExposure){
-    exposuretime = minExposure;
+  exposureTime += 1000; //increase 1s exposure time
+  if (exposureTime > maxExposure){ //roll over to defined minExposure
+    exposureTime = minExposure;
   }
 }
 
 void decreaseExposure(void){
-  exposuretime -= 1000;
-  if (exposuretime < minExposure){
-    exposuretime = maxExposure;
+  exposureTime -= 1000; //decrease 1s exposure time
+  if (exposureTime < minExposure){ //roll over to defined maxExposure
+    exposureTime = maxExposure;
   }
 }
 
-void handleButtons(int buttonvalue) {
+void increaseNumberOfExposures(void){
+  numberOfExposures++; //increase number of exposures
+  if (numberOfExposures > maxNumberOfExposures){ //roll over to defined minNumberOfExposures
+    numberOfExposures = minNumberOfExposures;
+  }
+}
 
-  display.setCursor(0, 40); 
+void decreaseNumberOfExposures(void){
+  numberOfExposures--; //decrease number of exposures
+  if (numberOfExposures < minNumberOfExposures){ //roll over to defined maxNumberOfExposures
+    numberOfExposures = maxNumberOfExposures;
+  }
+}
+
+void nextSetting(void){
+  settingSelected++; //increase Setting
+  if (settingSelected > 2){ //Roll over
+    settingSelected = 1;
+  }
+}
+
+void displaySettingsScreen(void){
+  display.clearDisplay();
+
+  //Exposure Time
+  display.setCursor(0, 5);
+  display.setTextSize(1);
+  display.print(F("ExpoTime:  "));
+  display.setCursor(70, 5);
   display.setTextSize(2);
+  display.print(exposureTime / 1000);
+  display.print(F("s"));
+  if (settingSelected == 1){ // highlight if selected
+    display.drawRect(65, 0, 60, 24, SSD1306_WHITE);
+  }
 
-  if (buttonvalue <= valueButtonUp + buttonTolerance && buttonvalue >= valueButtonUp - buttonTolerance){
-    display.print(F("UP"));
-    increaseExposure();
+  //Number of Exposures
+  display.setCursor(0, 25);
+  display.setTextSize(1);
+  display.print(F("Exposures:  "));
+  display.setCursor(70, 25);
+  display.setTextSize(2);
+  display.print(numberOfExposures);
+  if (settingSelected == 2){ // highlight if selected
+    display.drawRect(65, 20, 60, 24, SSD1306_WHITE);
   }
-  if (buttonvalue <= valueButtonDown + buttonTolerance && buttonvalue >= valueButtonDown - buttonTolerance){
-    display.print(F("DOWN"));
-    decreaseExposure();
-  }
-  if (buttonvalue <= valueButtonNext + buttonTolerance && buttonvalue >= valueButtonNext - buttonTolerance){
-    display.print(F("NEXT"));
-  }
-  if (buttonvalue <= valueButtonStart + buttonTolerance && buttonvalue >= valueButtonStart - buttonTolerance){
-    display.print(F("START"));
 
+  display.display();
+}
+
+void handleButtonsInSettings(int buttonvalue) {
+
+  if (buttonvalue <= valueButtonUp + buttonTolerance && buttonvalue >= valueButtonUp - buttonTolerance){ //UP
+    if (settingSelected == 1){
+      increaseExposure();
+    }else if(settingSelected == 2){
+      increaseNumberOfExposures();
+    }
+    
+  }
+
+  if (buttonvalue <= valueButtonDown + buttonTolerance && buttonvalue >= valueButtonDown - buttonTolerance){ //DOWN
+    if (settingSelected == 1){
+      decreaseExposure();
+    }else if(settingSelected == 2){
+      decreaseNumberOfExposures();
+    }
+    
+  }
+
+  if (buttonvalue <= valueButtonNext + buttonTolerance && buttonvalue >= valueButtonNext - buttonTolerance){ //NEXT
+    nextSetting();
+  }
+
+  if (buttonvalue <= valueButtonStart + buttonTolerance && buttonvalue >= valueButtonStart - buttonTolerance){ //START
     digitalWrite(pinRelayTrigger, HIGH);
   }else{
     digitalWrite(pinRelayTrigger, LOW);
@@ -91,23 +152,10 @@ void loop() {
   int val = analogRead(pinAnalogButtonInput);
   Serial.println(val);
 
-  display.clearDisplay();
-  display.setTextSize(1);
+  if (!isExposing){
+    displaySettingsScreen();
+    handleButtonsInSettings(val);
+    delay(100); //tick for settings is 100ms
+  }
 
-  display.setCursor(0, 0); 
-  display.print(val);
-
-  display.setCursor(40, 0); 
-  display.print(millis());
-
-  display.setCursor(0, 20); 
-  display.print(exposuretime);
-
-  display.display();
-
-  handleButtons(val);
-
-  display.display();
-
-  delay(100);
 }
