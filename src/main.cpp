@@ -20,7 +20,7 @@
 #define maxExposure 300000
 #define minNumberOfExposures 1
 #define maxNumberOfExposures 100 //absolute max 255
-#define waitingTimeBetweenExposures 1000
+#define waitingTimeBetweenExposures 2000
 
 //OLED
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
