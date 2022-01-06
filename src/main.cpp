@@ -31,11 +31,11 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Global Variables
 bool isExposing = false;
-int numberOfExposures = 5;
-long exposureTime = 2000;
+byte numberOfExposures = 5;
+unsigned long exposureTime = 2000;
 byte settingSelected  = 1;
 byte exposureCounter = 0;
-int startedSessionAtMillis = 0;
+unsigned long startedSessionAtMillis = 0;
 bool abortSession = false;
 
 void increaseExposure(void){
