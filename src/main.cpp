@@ -31,8 +31,8 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Global Variables
 bool isExposing = false;
-byte numberOfExposures = 5;
-unsigned long exposureTime = 2000;
+byte numberOfExposures = 30;
+unsigned long exposureTime = 120000;
 byte settingSelected = 1;
 byte exposureCounter = 0;
 unsigned long startedSessionAtMillis = 0;
@@ -164,6 +164,29 @@ void handleButtonsInSettings()
   }
 }
 
+void handleButtonsInSession()
+{
+  int buttonvalue = analogRead(pinAnalogButtonInput);
+
+  if (buttonvalue <= valueButtonUp + buttonTolerance && buttonvalue >= valueButtonUp - buttonTolerance) //UP
+  {
+  }
+
+  if (buttonvalue <= valueButtonDown + buttonTolerance && buttonvalue >= valueButtonDown - buttonTolerance) //DOWN
+  {
+  }
+
+  if (buttonvalue <= valueButtonNext + buttonTolerance && buttonvalue >= valueButtonNext - buttonTolerance) //NEXT
+  {
+    abortSession = true;
+  }
+
+  if (buttonvalue <= valueButtonStart + buttonTolerance && buttonvalue >= valueButtonStart - buttonTolerance) //START
+  {
+    //
+  }
+}
+
 void displayExposureScreen(bool waiting)
 {
   display.clearDisplay();
@@ -193,6 +216,14 @@ void displayExposureScreen(bool waiting)
   {
     int timeSpentInExposure = (exposureTime - (startMillis + exposureTime - millis())) / 1000;
     display.print(timeSpentInExposure);
+  }
+
+  //Abort Session
+  if (abortSession)
+  {
+    display.setCursor(90, 54);
+    display.setTextSize(1);
+    display.print(F("ABORT"));
   }
 
   //Settings
@@ -236,20 +267,21 @@ void loop()
 {
 
   while (!isExposing) //Settings
-  { 
+  {
     displaySettingsScreen();
     handleButtonsInSettings();
     delay(100); //tick for settings is 100ms
   }
 
   while (isExposing) //Exposing
-  { 
+  {
 
     startMillis = millis();
     while (startMillis + exposureTime > millis())
     {
       digitalWrite(pinRelayTrigger, HIGH);
       displayExposureScreen(false);
+      handleButtonsInSession();
     }
 
     startMillis = millis();
@@ -257,10 +289,11 @@ void loop()
     {
       digitalWrite(pinRelayTrigger, LOW);
       displayExposureScreen(true);
+      handleButtonsInSession();
     }
 
     exposureCounter++;
-    if (exposureCounter > numberOfExposures)
+    if (exposureCounter > numberOfExposures || abortSession)
     {
       isExposing = false;
     }
