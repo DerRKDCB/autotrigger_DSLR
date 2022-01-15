@@ -19,7 +19,7 @@ The device uses a 2.5mm headphoe jack to simulate an remote trigger. It is power
 
 ### Ordering PCB and Parts
 
-Order the PCB from a manufacturer you like, i use [JLCPCB](https://jlcpcb.com/ "JLCPCB"), by uploading the prepared gerber files.
+Order the PCB from a manufacturer you like, i use [JLCPCB](https://jlcpcb.com/ "JLCPCB"), by uploading the [prepared gerber files](KiCAD/autotrigger_dslr_v1.zip).
 
 #### Partslist:
 | Part  | Value  | Package  | Comment  | Link  |
