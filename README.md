@@ -57,12 +57,15 @@ Order the PCB from a manufacturer you like, i use [JLCPCB](https://jlcpcb.com/ "
 | U2  | AMS1117-3.3  | SOT-223-3  |   | https://www.lcsc.com/product-detail/Linear-Voltage-Regulators-LDO_PUOLOP-AMS1117-3-3_C351784.html  |
 
 #### You also need:
-1x USB A cable (any can be used because it's solderd directly to the pcb)
-1x 2.5mm headphone jack cable https://www.aliexpress.com/item/4001182848617.html
-8x M2.5 5mm bolts https://www.aliexpress.com/item/32963722509.html
-cable ties for strain relief
+- 1x USB A cable (any can be used because it's solderd directly to the pcb)
+- 1x 2.5mm headphone jack cable https://www.aliexpress.com/item/4001182848617.html
+- 8x M2.5 5mm bolts https://www.aliexpress.com/item/32963722509.html
+- cable ties for strain relief
+- tape (electrical/kepton/... doesn't really matter)
+- For programming: USB to serial Adapter and jumper cables
 
-For programming: USB to serial Adapter and jumper cables
+### 3D Printing
+Print [case](FreeCAD/3dp/stl/case-case.stl) and [lid](FreeCAD/3dp/stl/case-led.stl) in PLA (recommended, but doesn't really matter) and standard settings.
 
 ### Soldering
 
@@ -75,12 +78,48 @@ For programming: USB to serial Adapter and jumper cables
 
 ### Assembly
 
-Screw PCB to case using four M2.5 bolts.
-Put a zip tie around both cables to wirk as strain relief
-Now flash software to the autotrigger, see *Configuration and Programming* section
-Screw lid to case using four M2.5 bolts.
+1. Screw PCB to case using four M2.5 bolts.
+2. Put a zip tie around both cables to wirk as strain relief.
+3. Now upload software to the autotrigger, see *Configuration and Programming* section.
+4. Screw lid to case using four M2.5 bolts.
 
 ## Configuration and Programming
+
+1. autotrigger_DSLR is programmed in the [PlatformIO IDE](https://docs.platformio.org/en/latest/integration/ide/vscode.html#ide-vscode "PlatformIO IDE"). PlatformIO is needed to upload the Software to the autotrigger.
+2. Open Project in PlatformIO
+3. Open [src/main.cpp](src/main.cpp)
+4. Change function options at the top of the document, if needed (more explosures, longer exposures, ...)
+```cpp
+//Function Options
+#define minExposure 1000 //minimum exposure time in ms
+#define maxExposure 300000 //maximum exposure time in ms
+#define minNumberOfExposures 1
+#define maxNumberOfExposures 100 //absolute max 255
+#define waitingTimeBetweenExposures 2000 //time the controller waits for camera until it starts the next exposure
+```
+5. If buttons don't work properly, you may have to increase `buttonTolerance` or adjust button values
+```cpp
+//Button Values
+#define valueButtonUp 588
+#define valueButtonDown 328
+#define valueButtonNext 231
+#define valueButtonStart 181
+#define buttonTolerance 10
+```
+6. Connect the autotrigger via USB to Serial Adapter. Only connect 5V **OR** 3.3V
+
+| Serial Adapter  | autotrigger  |
+| ------------ | ------------ |
+| GND  | GND  |
+| 5V  | 5  |
+| **or** 3.3V  | **or** 3.3  |
+| TX  | RX  |
+| RX  | TX  |
+
+7. Hit Upload, press both boot and reset button, release reset button, wait till upload has started, release boot button.
+8. Wait until upload is finished.
+9. press reset.
+10. **ENJOY**
 
 ## Todo
 - Mounting holes PCB need adjusdment, false measurement, make holes all the way though
