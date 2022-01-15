@@ -16,11 +16,11 @@
 #define buttonTolerance 10
 
 //Function Options
-#define minExposure 1000
-#define maxExposure 300000
+#define minExposure 1000 //minimum exposure time in ms
+#define maxExposure 300000 //maximum exposure time in ms
 #define minNumberOfExposures 1
 #define maxNumberOfExposures 100 //absolute max 255
-#define waitingTimeBetweenExposures 2000
+#define waitingTimeBetweenExposures 2000 //time the controller waits for camera until it starts the next exposure in ms
 
 //OLED
 #define SCREEN_WIDTH 128    // OLED display width, in pixels
