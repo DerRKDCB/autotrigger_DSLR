@@ -1,9 +1,13 @@
 # autotrigger_DSLR
 Device to automaticly take a number of long exposure pictures designed for astrophotography. 
-Works with any DSLR that has a 2.5mm jack remote trigger connector and a bulb exposure mode
+Works with any DSLR that has a 2.5mm jack remote trigger connector and a bulb exposure mode. Here is a [Video](https://www.youtube.com/watch?v=2kZ-wBnaWUU "Video") with the device in Action
+
+[![autotrigger_DSLR](doc/img/autotrigger.jpg "autotrigger_DSLR")](doc/img/autotrigger.jpg"autotrigger_DSLR")
 
 ## How to use
 The device uses a 2.5mm headphoe jack to simulate an remote trigger. It is powered my USB. Uses SSD1306 OLED Display as Display. With 4 buttons you can change the exposure time and the number of Pictures to take. The controller is an ESP8266 (ESP-12F module), so wifi capabilities could be implemented (**but are not, yet**).
+
+[![setup overview](doc/img/setup_overview.png "autotrigger_DSLR")](setup_overview.png"autotrigger_DSLR")
 
 1. Plug the USB into any USB Power source (Powerbank/Phone Charger/...) to power the device. Power consumtion is only 50mA so any Power source should work. Make sure you have a Power source that doesn't switch off because not enough current is detected.
 2. Plug the headphone jack into the external/remote trigger socket of the camera.
@@ -14,6 +18,8 @@ The device uses a 2.5mm headphoe jack to simulate an remote trigger. It is power
 7. Press START to start the configured Series of Exposures.
 8. While one Session is runnig, some info is displayed (exposure number, time of current exposure, total time)
 9. Wait until session is finished or press NEXT to abort an session (current exposue will be finished)
+
+[![session_screen](doc/img/session_screen.jpg "session_screen")](doc/img/session_screen.jpg"session_screen")
 
 ## Building
 
@@ -69,12 +75,13 @@ Print [case](FreeCAD/3dp/stl/case-case.stl) and [lid](FreeCAD/3dp/stl/case-led.s
 
 ### Soldering
 
-1. Start soldering all SMD components, using the partslist above. Diode cathodes are indicated with "-".
+1. Start soldering all SMD components, using the [schematic](doc/autotrigger_DSLR_v1_schematic.pdf) and the partslist above. Diode cathodes are indicated with "-".
 2. Solder Programming Pin headers and THT pushbuttons.
 3. Isolate the backside of the SSD1306 OLED Display with some tape, then solder in place.
 4. Before soldering wires put them though holes in the case.
 5. USB A cable: strip wire and check which is +5V (propably red) and GND (propably black) using a multimeter. Then solder to J4.
 6. Headphone Jack cable: cut away female jack. Strip wire and tin the tips so that the isolating coating is burnt way (thats the way i do it). Then check which are the needed wires (multimeter continuity) and solder to J3, according to picture below.
+[![headphone_jack_connections](doc/img/headphone_jack_connections.jpg "headphone_jack_connections")](doc/img/headphone_jack_connections.jpg"headphone_jack_connections")
 
 ### Assembly
 
@@ -123,4 +130,3 @@ Print [case](FreeCAD/3dp/stl/case-case.stl) and [lid](FreeCAD/3dp/stl/case-led.s
 
 ## Todo
 - Mounting holes PCB need adjusdment, false measurement, make holes all the way though
-- finish todo: add pictures, 
