@@ -1,9 +1,9 @@
 # autotrigger_DSLR
 Device to automaticly take a number of long exposure pictures designed for astrophotography. 
-Works with any DSLR that has a remote trigger connector and a bulb exposure mode
+Works with any DSLR that has a 2.5mm jack remote trigger connector and a bulb exposure mode
 
 ## How to use
-The device uses a 2.5mm headphoe jack to simulate an remote trigger. It is powered my USB. Uses SSD1306 OLED Display as Display. With 4 buttons you can change the exposure time and the number of Pictures to take. The controller is an ESP8266 (ESP-12F module), so wifi capabilities could be implemented, **but are not yet**.
+The device uses a 2.5mm headphoe jack to simulate an remote trigger. It is powered my USB. Uses SSD1306 OLED Display as Display. With 4 buttons you can change the exposure time and the number of Pictures to take. The controller is an ESP8266 (ESP-12F module), so wifi capabilities could be implemented (**but are not, yet**).
 
 1. Plug the USB into any USB Power source (Powerbank/Phone Charger/...) to power the device. Power consumtion is only 50mA so any Power source should work. Make sure you have a Power source that doesn't switch off because not enough current is detected.
 2. Plug the headphone jack into the external/remote trigger socket of the camera.
@@ -21,7 +21,7 @@ The device uses a 2.5mm headphoe jack to simulate an remote trigger. It is power
 
 Order the PCB from a manufacturer you like, i use [JLCPCB](https://jlcpcb.com/ "JLCPCB"), by uploading the prepared gerber files.
 
-Partslist:
+#### Partslist:
 | Part  | Value  | Package  | Comment  | Link  |
 | ------------ | ------------ | ------------ | ------------ | ------------ |
 | C1  | 10uF  | 0805  |   | https://www.lcsc.com/product-detail/Multilayer-Ceramic-Capacitors-MLCC-SMD-SMT_FH-Guangdong-Fenghua-Advanced-Tech-0805X106M160NT_C2832123.html  |
@@ -35,7 +35,7 @@ Partslist:
 | J1  |   | 5x2.54mm  | Pin Header Female  | https://www.lcsc.com/product-detail/Female-Headers_Ckmtw-Shenzhen-Cankemeng-B-2200S05P-A120_C124414.html  |
 | J2  | SSD1306  | SSD1306  | Display, look for pinout *GND VCC SCL SDA* , 4Pin, White | https://www.aliexpress.com/item/32638662748.html |
 | K1  | G6K  | G6K-2F  | Omron Relay  | https://www.lcsc.com/product-detail/Signal-Relays_Omron-Electronics-G6K-2F-Y-TR-DC5_C47190.html  |
-| Q1  | MosFET  |   | N-Channel  | https://www.lcsc.com/product-detail/MOSFETs_Sinopower-Semicon-SM2326NSANC-TRG_C368561.html  |
+| Q1  | MosFET  | SOT-23  | N-Channel  | https://www.lcsc.com/product-detail/MOSFETs_Sinopower-Semicon-SM2326NSANC-TRG_C368561.html  |
 | R1  | 10k  | 0805  |   | https://www.lcsc.com/product-detail/Chip-Resistor-Surface-Mount_TyoHM-RMC080510K1-N_C269742.html  |
 | R2  | 10k  | 0805  |   | https://www.lcsc.com/product-detail/Chip-Resistor-Surface-Mount_TyoHM-RMC080510K1-N_C269742.html  |
 | R3  | 1k  | 0805  |   | https://www.lcsc.com/product-detail/Chip-Resistor-Surface-Mount_TyoHM-RMC08051K5-N_C269727.html  |
@@ -56,13 +56,32 @@ Partslist:
 | U1  | ESP8266  | ESP-12F  |   | https://www.lcsc.com/product-detail/WiFi-Modules_Ai-Thinker-ESP-12F-ESP8266MOD_C82891.html  |
 | U2  | AMS1117-3.3  | SOT-223-3  |   | https://www.lcsc.com/product-detail/Linear-Voltage-Regulators-LDO_PUOLOP-AMS1117-3-3_C351784.html  |
 
+#### You also need:
+1x USB A cable (any can be used because it's solderd directly to the pcb)
+1x 2.5mm headphone jack cable https://www.aliexpress.com/item/4001182848617.html
+8x M2.5 5mm bolts https://www.aliexpress.com/item/32963722509.html
+cable ties for strain relief
 
+For programming: USB to serial Adapter and jumper cables
 
+### Soldering
 
+1. Start soldering all SMD components, using the partslist above. Diode cathodes are indicated with "-".
+2. Solder Programming Pin headers and THT pushbuttons.
+3. Isolate the backside of the SSD1306 OLED Display with some tape, then solder in place.
+4. Before soldering wires put them though holes in the case.
+5. USB A cable: strip wire and check which is +5V (propably red) and GND (propably black) using a multimeter. Then solder to J4.
+6. Headphone Jack cable: cut away female jack. Strip wire and tin the tips so that the isolating coating is burnt way (thats the way i do it). Then check which are the needed wires (multimeter continuity) and solder to J3, according to picture below.
 
+### Assembly
 
+Screw PCB to case using four M2.5 bolts.
+Put a zip tie around both cables to wirk as strain relief
+Now flash software to the autotrigger, see *Configuration and Programming* section
+Screw lid to case using four M2.5 bolts.
 
 ## Configuration and Programming
 
 ## Todo
-- Mounting holes PCB need adjusdment, false measurement
+- Mounting holes PCB need adjusdment, false measurement, make holes all the way though
+- finish todo: add pictures, 
