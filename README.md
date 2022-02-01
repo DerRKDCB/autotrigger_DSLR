@@ -129,4 +129,4 @@ Print [case](FreeCAD/3dp/stl/case-case.stl) and [lid](FreeCAD/3dp/stl/case-led.s
 10. **ENJOY**
 
 ## Todo
-- Mounting holes PCB need adjusdment, false measurement, make holes all the way though
+- Mounting holes PCB need adjusdment, false measurement
